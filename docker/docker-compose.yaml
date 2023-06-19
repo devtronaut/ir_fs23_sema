@@ -1,0 +1,18 @@
+version: '3.8' 
+services:
+  notebooks:
+    build: 
+      dockerfile: Dockerfile
+    container_name: ir-notebooks
+    ports:
+      - 7078:7077 # Spark Master
+      - 8083:8080 # Spark Master UI - 8082 less likely to conflict
+      - 8084:8081 # Spark Worker UI
+      - 4042:4040 # Spark UI
+      - 4043:4041 # Spark UI
+      - 9999:8888 # Jupyter Notebook UI 
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: "../Sema/"
+        target: "/home/jovyan/sema"
