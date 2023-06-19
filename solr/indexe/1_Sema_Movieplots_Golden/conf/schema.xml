@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema name="default-config" version="1.6">
+	
+	<fieldType name="identifier" class="solr.StrField" />
+	<fieldType name="text_facet" class="solr.StrField" sortMissingLast="true" docValues="true"/>
+	<fieldType name="int" class="solr.IntPointField" />
+	<fieldType name="long" class="solr.LongPointField" />
+	
+	<fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
+		<analyzer type="query">
+			<!-- Delimits at punctuation and whitespace (exceptions: dot without whitespace, @-sign) -->
+			<tokenizer class="solr.ClassicTokenizerFactory" />
+
+			<!-- Strip periods from acronyms, remove "'s" from possessives -->
+			<filter class="solr.ClassicFilterFactory" />
+
+			<!-- Convert uppercase letters to lowercase -->
+			<filter class="solr.LowerCaseFilterFactory" />
+
+			<filter class="solr.StopFilterFactory" ignoreCase="true" words="stop.txt" format="snowball"/> 
+
+			<filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="true" />
+		</analyzer>
+		<analyzer type="index">
+			<!-- Delimits at punctuation and whitespace (exceptions: dot without whitespace, @-sign) -->
+			<tokenizer class="solr.ClassicTokenizerFactory" />
+
+			<!-- Strip periods from acronyms, remove "'s" from possessives -->
+			<filter class="solr.ClassicFilterFactory" />
+
+			<!-- Convert uppercase letters to lowercase -->
+			<filter class="solr.LowerCaseFilterFactory" />
+
+			<filter class="solr.StopFilterFactory" ignoreCase="true" words="stop.txt" format="snowball"/> 
+
+			<filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="true" />
+		</analyzer>
+	</fieldType>
+	
+	<fieldType name="fulltext_search" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
+		<analyzer type="index">
+			<tokenizer class="solr.ClassicTokenizerFactory"/>
+  			<filter class="solr.ClassicFilterFactory"/>
+			<filter class="solr.LowerCaseFilterFactory"/>
+			<filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="false"/>
+			<filter class="solr.StopFilterFactory" ignoreCase="true" words="stop.txt" format="snowball"/> 
+			<filter class="solr.SnowballPorterFilterFactory"/>
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.ClassicTokenizerFactory"/>
+  			<filter class="solr.ClassicFilterFactory"/>
+			<filter class="solr.LowerCaseFilterFactory"/>
+			<filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="false"/>
+			<filter class="solr.StopFilterFactory" ignoreCase="true" words="stop.txt" format="snowball"/> 
+			<filter class="solr.SnowballPorterFilterFactory"/>
+		</analyzer>
+	</fieldType>
+
+	<fieldType name="suggestion" class="solr.TextField" positionIncrementGap="100">
+		<analyzer>
+			<!-- Delimits at punctuation and whitespace (exceptions: dot without whitespace, @-sign) -->
+			<tokenizer class="solr.ClassicTokenizerFactory" />
+
+			<!-- Strip periods from acronyms, remove "'s" from possessives -->
+			<filter class="solr.ClassicFilterFactory" />
+
+			<!-- Convert uppercase letters to lowercase -->
+			<filter class="solr.LowerCaseFilterFactory" />
+<!-- 
+			<filter class="solr.StopFilterFactory" words="stop.txt" ignoreCase="true"
+			format="snowball" /> -->
+		</analyzer>
+	</fieldType>
+
+	<field name="_version_" type="long" indexed="false" stored="false" />
+	<field name="id" type="identifier" indexed="true" multiValued="false"  />
+	<field name="release" type="int" multiValued="false" sortMissingLast="true"/>
+	<field name="title" type="text_general" multiValued="false"/>
+	<field name="origin" type="text_general" multiValued="false"/>
+	<field name="director" type="text_general" multiValued="false"/>
+	<field name="cast" type="text_general" multiValued="false"/>
+	<field name="genre" type="text_general" multiValued="false"/>
+	<field name="wikipage" type="text_general" indexed="false" multiValued="false"/>
+	<field name="plot" type="text_general" multiValued="false" />
+
+	<!-- Search field over all fields in the set -->
+	<field name="fulltext_search" type="fulltext_search" termVectors="true" multiValued="true" stored="false"/>
+
+	<!-- Facet fields -->
+	<field name="release_facet" type="text_facet" multiValued="false"/>
+	<field name="origin_facet" type="text_facet" multiValued="false"/>
+	<field name="genre_facet" type="text_facet" indexed="true" stored="false" multiValued="true"/>
+
+	<!-- Suggestion field -->
+	<field name="word_suggestion" type="suggestion" multiValued="true"/>
+
+	<copyField source="title" dest="fulltext_search"/>
+	<copyField source="plot" dest="fulltext_search"/>
+	<copyField source="cast" dest="fulltext_search"/>
+	<copyField source="director" dest="fulltext_search"/>
+	<copyField source="origin" dest="fulltext_search"/>
+	<copyField source="release" dest="fulltext_search"/>
+
+	<copyField source="release" dest="release_facet"/>
+	<copyField source="origin" dest="origin_facet"/>
+	<copyField source="genre" dest="genre_facet"/>
+
+	<copyField source="title" dest="word_suggestion"/>
+	<copyField source="plot" dest="word_suggestion"/>
+
+	<uniqueKey>id</uniqueKey>
+</schema>

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# bin/post -c <core-name> /home/<username>/ffhs_s6_ir/daten/1_<data-name>/solr_xml/*
+/opt/solr/bin/post -c Sema_Movieplots_Full ../daten/search_set.xml
